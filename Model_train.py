@@ -44,8 +44,8 @@ def load_base_model():
     return base_model
 
 
-train_path = "Sign-Language-Digits-Dataset-master/HandDetect/train"
-test_path = "Sign-Language-Digits-Dataset-master/HandDetect/test"
+train_path = "D:/Projects/Chopsticks/Datasets/HandDetect/train"
+test_path = "D:/Projects/Chopsticks/Datasets/HandDetect/test"
 image_inp_size = 224
 traindata, testdata = get_train_test(train_path, test_path, image_inp_size)
 
