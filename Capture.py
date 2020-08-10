@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from tensorflow.keras.models import load_model
 from tensorflow.keras.models import model_from_json
 
 videoCaptureObject = cv2.VideoCapture(0)
@@ -41,15 +40,13 @@ while True:
     cpul1 = cv2.resize(cpul, (224, 224))
     img = np.asarray(cpul1)
     img = np.expand_dims(img, axis=0)
-    print(img.shape)
 
     output = loaded_model.predict(img)
 
     if output[0][0] < output[0][1]:
         print("hand")
-        cv2.rectangle(frame, (X1[0], Y1[0]), (X2[0], Y2[0]), (255, 255, 0), 5)
     else:
-        continue
+        print("not hand")
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         videoCaptureObject.release()
