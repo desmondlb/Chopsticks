@@ -24,6 +24,7 @@ def add_custom_layers(base_model, dense_layers, activation, base_trainable):
     x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
     x = Dense(dense_layers[0])(x)
     x = Dense(dense_layers[1])(x)
+    x = Dense(dense_layers[2])(x)
     output = Dense(2, activation=activation)(x)
     model = Model(base_model.input, output)
     return model
@@ -32,10 +33,13 @@ def add_custom_layers(base_model, dense_layers, activation, base_trainable):
 def train(model, traindata, testdata):
     checkpoint = ModelCheckpoint("Resnet18_1.h5", monitor='val_accuracy', verbose=1,
                                  save_best_only=True, save_weights_only=False, mode='auto', save_freq='epoch')
-    early = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=30, verbose=1, mode='auto')
+    early = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=20, verbose=1, mode='auto')
     model.fit(traindata, steps_per_epoch=5, epochs=100,
               validation_data=testdata, validation_steps=1, callbacks=[checkpoint, early])
     model.save_weights("Resnet18_1.h5")
+    model_json = model.to_json()
+    with open("model.json", "w") as json_file:
+        json_file.write(model_json)
 
 
 def load_base_model():
@@ -50,7 +54,7 @@ image_inp_size = 224
 traindata, testdata = get_train_test(train_path, test_path, image_inp_size)
 
 base_model = load_base_model()
-dense_layers = [1024, 256]
+dense_layers = [2048, 1024, 256]
 model = add_custom_layers(base_model, dense_layers, activation='softmax', base_trainable=False)
 model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy', metrics=['accuracy'])
 train(model, traindata, testdata)
