@@ -18,7 +18,7 @@ class DataAugment:
 
     def random_rotation(self, img_to_transform):
         try:
-            rotation_degree = random.uniform(-20, 20)
+            rotation_degree = random.uniform(-15, 15)
 
             return ndimage.rotate(img_to_transform, rotation_degree)
 
@@ -86,6 +86,6 @@ class DataAugment:
             print(ex)
 
 
-dataset_path = 'D:\\Projects\\Chopsticks\\Datasets\\HandDetect\\test\\1'
+dataset_path = 'D:\\Projects\\Chopsticks\\Datasets\\4'
 aug = DataAugment(dataset_path)
 aug.augment()
