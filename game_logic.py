@@ -1,4 +1,6 @@
 from copy import deepcopy
+import random
+import time
 
 
 class GameLogic:
@@ -152,6 +154,7 @@ class GameLogic:
         else:
             child_nodes = []
             moves = ['div', 'l_oppl', 'l_oppr', 'r_oppl', 'r_oppr']
+            random.shuffle(moves)
             for move in moves:
                 child_nodes.append(self.do_if_valid(move, states, max_turn))
             child_nodes = list(filter(None, child_nodes))
@@ -164,5 +167,6 @@ class GameLogic:
                 return child_nodes[child_nodes_values.index(min(child_nodes_values))]
 
     def cpu_turn(self, states):
+        time.sleep(3)
         new_state = self.minmax(states, 0, True, 4)
         return new_state, 1
