@@ -121,5 +121,4 @@ class Play:
             pygame.quit()
             cv2.destroyAllWindows()
 
-
 obj = Play()
