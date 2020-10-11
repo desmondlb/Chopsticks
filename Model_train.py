@@ -32,12 +32,14 @@ def add_custom_layers(base_model, dense_layers, activation, base_trainable):
 
 
 def train(model, traindata, testdata):
-    checkpoint = ModelCheckpoint("Resnet50_1.h5", monitor='val_categorical_accuracy', verbose=1,
+    checkpoint1 = ModelCheckpoint("Resnet50.h5", monitor='categorical_accuracy', verbose=1,
                                  save_best_only=True, save_weights_only=False, mode='auto', save_freq='epoch')
-    early = EarlyStopping(monitor='val_categorical_accuracy', min_delta=0, patience=30, verbose=1, mode='auto')
+    checkpoint2 = ModelCheckpoint("Resnet50.h5", monitor='val_categorical_accuracy', verbose=1,
+                                 save_best_only=True, save_weights_only=False, mode='auto', save_freq='epoch')
+    early = EarlyStopping(monitor='categorical_accuracy', min_delta=0, patience=30, verbose=1, mode='auto')
     model.fit(traindata, steps_per_epoch=4, epochs=100,
-              validation_data=testdata, validation_steps=1, callbacks=[checkpoint, early])
-    model.save_weights("Resnet50_1.h5")
+              validation_data=testdata, validation_steps=1, callbacks=[checkpoint1, checkpoint2, early])
+    model.save_weights("Resnet50.h5")
     model_json = model.to_json()
     with open("R50_model.json", "w") as json_file:
         json_file.write(model_json)
@@ -49,8 +51,8 @@ def load_base_model():
     return base_model
 
 
-train_path = "D:/Projects/Chopsticks/Datasets/Dataset/train"
-test_path = "D:/Projects/Chopsticks/Datasets/Dataset/test"
+train_path = "D:/Projects/Chopsticks/Datasets/new2/train"
+test_path = "D:/Projects/Chopsticks/Datasets/new2/test"
 image_inp_size = 224
 traindata, testdata = get_train_test(train_path, test_path, image_inp_size)
 
