@@ -1,44 +1,47 @@
 import cv2
 import numpy as np
+import os
 from tensorflow.keras.models import model_from_json
 from Chopsticks.game_logic import GameLogic
+import random
 
 
 class Capture:
     def __init__(self):
         self.states = [1, 1, 1, 1]
         self.categories = [1, 2, 3, 4]
-        self.turn_flag = 1
+        self.turn_flag = random.choice([0, 1])
         self.div_flag = 0  # indicates that player chose to divide
         self.player_inputs = []  # save the images to be predicted one at a time
         self.player_preds1 = []  # save the predicted values of num fingers during division as well as not div
         self.player_preds2 = []  # used for saving the predicted values of num fingers during division
         self.pos = []  # list to indicate the position of hand during players turn
         self.r50_model, self.r18_model = self.load_models()
-        self.display_message = "Good Luck!"
+        self.display_message = "It's your turn!" if self.turn_flag else "It's CPU's turn!"
 
     def load_models(self):
         # load json and create model
-        r50_json_file = open('R50_model.json', 'r')
+        r50_json_file = open(os.path.join('models', 'R50_model.json'), 'r')
         loaded_r50_model_json = r50_json_file.read()
         r50_json_file.close()
         r50_model = model_from_json(loaded_r50_model_json)
         # load weights into new model
-        r50_model.load_weights("Resnet50_1.h5")
+        r50_model.load_weights(os.path.join('models', "Resnet50.h5"))
 
         # load json and create model
-        r18_json_file = open('model.json', 'r')
+        r18_json_file = open(os.path.join('models', 'R18_model.json'), 'r')
         loaded_r18_model_json = r18_json_file.read()
         r18_json_file.close()
         r18_model = model_from_json(loaded_r18_model_json)
         # load weights into new model
-        r18_model.load_weights("Resnet18_1.h5")
+        r18_model.load_weights(os.path.join('models', "Resnet18.h5"))
 
         return r50_model, r18_model
 
     def run_game_logic(self):
         while True:
             if self.div_flag and self.turn_flag:
+                self.display_message = "It's your turn!"
                 if len(self.player_preds1) <= 2 and len(self.player_inputs) > 1:
                     input_plr = self.player_inputs.pop()
                     input_pll = self.player_inputs.pop()
@@ -54,17 +57,17 @@ class Capture:
                             self.div_flag = 0
 
                         else:
-                            self.display_message = "Not a valid division!"
+                            self.display_message = "Invalid division!"
 
                         self.player_preds1.clear()
                         self.player_preds2.clear()
                         self.player_inputs.clear()
 
             elif not self.div_flag and self.turn_flag:
+                self.display_message = "It's your turn!"
                 if len(self.player_preds1) <= 2 and len(self.player_inputs) > 0:
                     popped_image = self.player_inputs.pop()
                     self.player_preds1.append(self.categories[int(np.argmax(self.r50_model.predict(popped_image)[0]))])
-
                     if len(self.player_preds1) == 2:
                         num_fingers = max(set(self.player_preds1), key=self.player_preds1.count)
                         pos = max(set(self.pos), key=self.pos.count)
@@ -75,7 +78,7 @@ class Capture:
                             self.pos.clear()
 
                         else:
-                            self.display_message = "Not a valid move!"
+                            self.display_message = "Invalid move!"
 
                         self.player_preds1.clear()
                         self.player_inputs.clear()
@@ -132,7 +135,3 @@ class Capture:
             elif c_r:
                 self.pos.append(1)  # append the position of the cell where hand is
                 self.player_inputs.append(img2)
-
-            else:
-                self.display_message = "It's Your Turn!"
-
