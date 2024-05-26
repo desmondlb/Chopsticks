@@ -1,2 +1,2 @@
 # Chopsticks
-A computer-vision based Chopsticks game
+A computer-vision based game of sticks.
